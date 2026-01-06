@@ -12,6 +12,14 @@ Fokus utama:
 
 ---
 
+## ☕ Support
+
+If this package helps you, consider supporting the development:
+
+[![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=🍵&slug=henrywijayalie&button_colour=FFDD00&font_colour=000000&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/henrywijayalie)
+
+---
+
 ## Instalasi
 
 Tambahkan dependency yang dibutuhkan:
