@@ -32,8 +32,9 @@ Dokumen ini menjelaskan skema versioning dan contoh CHANGELOG untuk package **bl
 ### ✅ Compatibility #
 
 Tested on Flutter 3.38.5 with real android devices Oppo Reno 14 and PANDA Thermal Printer PRJ-R58B
-<!-- 
----
-## [0.1.1] - 2026-01-10
 
---- -->
+## [1.0.1]
+
+### Update
+
+- Update README
