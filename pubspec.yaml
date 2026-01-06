@@ -3,7 +3,7 @@ description: "Reusable Flutter helper for Bluetooth thermal printer (ESC/POS)"
 version: 0.0.1
 homepage: https://github.com/henrywijayalie/blue_thermal_helper
 repository: https://github.com/henrywijayalie/blue_thermal_helper
-issue_tracker: https://github.com/rywtech/blue_thermal_helper/issues
+issue_tracker: https://github.com/henrywijayalie/blue_thermal_helper/issues
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
