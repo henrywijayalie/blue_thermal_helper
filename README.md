@@ -70,6 +70,11 @@ Bluetooth Printer
 `BlueThermalHelper` adalah **single source of truth**.
 
 ---
+## Initial Helper
+
+```dart
+final _printer = BlueThermalHelper.instance;
+```
 
 ## Enum & Konfigurasi Kertas
 
@@ -369,3 +374,6 @@ Alignment otomatis berdasarkan chars-per-line.
 ### ✅ Compatibility #
 
 Tested on Flutter 3.38.5 with real android devices Oppo Reno 14 and PANDA Thermal Printer PRJ-R58B
+
+### Additional information #
+This is Just The Initial Version feel free to Contribute or Report any Bug!
