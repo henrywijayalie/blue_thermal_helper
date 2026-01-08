@@ -16,10 +16,12 @@ class ThermalPrinterSampleScreen extends StatefulWidget {
   });
 
   @override
-  State<ThermalPrinterSampleScreen> createState() => _ThermalPrinterSampleScreenState();
+  State<ThermalPrinterSampleScreen> createState() =>
+      _ThermalPrinterSampleScreenState();
 }
 
-class _ThermalPrinterSampleScreenState extends State<ThermalPrinterSampleScreen> {
+class _ThermalPrinterSampleScreenState
+    extends State<ThermalPrinterSampleScreen> {
   List<BluetoothPrinter> _devices = [];
 
   String _status = 'Idle';
@@ -435,7 +437,9 @@ class _ThermalPrinterSampleScreenState extends State<ThermalPrinterSampleScreen>
               _status,
             ),
             trailing: Icon(
-              _connectedMac != null ? Icons.bluetooth_connected : Icons.bluetooth_disabled,
+              _connectedMac != null
+                  ? Icons.bluetooth_connected
+                  : Icons.bluetooth_disabled,
               color: _connectedMac != null ? Colors.green : Colors.red,
             ),
           ),
@@ -490,11 +494,7 @@ class _ThermalPrinterSampleScreenState extends State<ThermalPrinterSampleScreen>
         final isLastUsed = d.address == _lastUsedMac;
 
         return Container(
-          color: isLastUsed
-              ? Colors.green.withOpacity(
-                  0.08,
-                )
-              : null,
+          color: isLastUsed ? Colors.green.withValues(alpha: 0.08) : null,
           child: ListTile(
             title: Text(
               d.name.isNotEmpty ? d.name : 'Unknown',

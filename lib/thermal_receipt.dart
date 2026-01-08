@@ -1,4 +1,6 @@
 // lib/thermal_receipt.dart
+import 'dart:developer';
+
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:image/image.dart' as img;
@@ -134,28 +136,92 @@ class ThermalReceipt {
     String assetPath, {
     PosAlign align = PosAlign.center,
   }) async {
-    final data = await rootBundle.load(assetPath);
-    final raw = data.buffer.asUint8List();
+    try {
+      // 1. Load asset
+      final data = await rootBundle.load(assetPath);
+      final raw = data.buffer.asUint8List();
 
-    final decoded = img.decodeImage(raw);
-    if (decoded == null) {
-      // unable to decode, skip
-      return;
+      // 2. Decode image
+      final decoded = img.decodeImage(raw);
+      if (decoded == null) {
+        log('logo(): decodeImage failed');
+        return;
+      }
+
+      img.Image image = decoded;
+
+      // 3. Flatten transparency (RGBA -> RGB white background)
+      if (image.hasAlpha) {
+        final bg = img.Image(
+          width: image.width,
+          height: image.height,
+          numChannels: 3,
+        );
+
+        // fill background white
+        for (final p in bg) {
+          p
+            ..r = 255
+            ..g = 255
+            ..b = 255;
+        }
+
+        // draw original onto white background
+        img.compositeImage(bg, image);
+        image = bg;
+      }
+
+      // 4. Convert to grayscale
+      image = img.grayscale(image);
+
+      // 5. Resize to paper width
+      final maxWidth = _paperMaxWidth(paperSize);
+      if (maxWidth <= 0) {
+        log('logo(): invalid paper width');
+        return;
+      }
+
+      if (image.width > maxWidth) {
+        image = img.copyResize(image, width: maxWidth);
+      }
+
+      // 6. Manual threshold (BLACK / WHITE) — API 4.x
+      const int threshold = 128;
+      for (final p in image) {
+        final luminance = p.r; // grayscale → r=g=b
+        if (luminance < threshold) {
+          p
+            ..r = 0
+            ..g = 0
+            ..b = 0;
+        } else {
+          p
+            ..r = 255
+            ..g = 255
+            ..b = 255;
+        }
+      }
+
+      // 7. Generate ESC/POS bytes
+      final imageBytes = _gen.image(image, align: align);
+      if (imageBytes.isEmpty) {
+        log('logo(): generator returned empty bytes');
+        return;
+      }
+
+      // 8. Append to printer buffer
+      _bytes.addAll(imageBytes);
+      _bytes.addAll(_gen.feed(1));
+
+      _preview.text('[LOGO]', center: true);
+
+      log(
+        'logo(): OK | size=${image.width}x${image.height} | bytes=${imageBytes.length}',
+      );
+    } catch (e, s) {
+      log('logo(): EXCEPTION $e');
+      log(s.toString());
     }
-
-    // estimate max width in pixels based on paper
-    final maxWidth = _paperMaxWidth(paperSize);
-
-    img.Image image = decoded;
-    if (image.width > maxWidth) {
-      image = img.copyResize(image, width: maxWidth);
-    }
-
-    // Generator.image accepts `imageLib.Image` from package:image
-    _bytes.addAll(_gen.image(image, align: align));
-    _bytes.addAll(_gen.feed(1));
-
-    _preview.text('[LOGO]', center: true);
   }
 
   /// Helper to determine a reasonable max width per paper size
@@ -279,7 +345,8 @@ class ThermalReceipt {
   void row(String left, String right, {bool bold = false}) {
     rowColumns([
       col(left, 6, size: ThermalFontSize.normal, bold: bold),
-      col(right, 6, size: ThermalFontSize.normal, bold: bold, align: PosAlign.right),
+      col(right, 6,
+          size: ThermalFontSize.normal, bold: bold, align: PosAlign.right),
     ]);
   }
 
@@ -308,7 +375,8 @@ class ThermalReceipt {
   // -----------------------
   void note(String text) {
     // print indented line with prefix
-    _bytes.addAll(_gen.text('  - $text', styles: const PosStyles(align: PosAlign.left)));
+    _bytes.addAll(
+        _gen.text('  - $text', styles: const PosStyles(align: PosAlign.left)));
     _preview.text('  > $text');
   }
 }
