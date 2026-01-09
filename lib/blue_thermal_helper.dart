@@ -20,10 +20,7 @@ class BluetoothPrinter {
 }
 
 /// Paper enum
-enum ThermalPaper {
-  mm58,
-  mm80
-}
+enum ThermalPaper { mm58, mm80 }
 
 /// Small helper mapping for paper -> properties
 class ThermalPaperHelper {
@@ -54,7 +51,8 @@ class ThermalPaperHelper {
     }
   }
 
-  static String displayName(ThermalPaper p) => p == ThermalPaper.mm80 ? '80 mm' : '58 mm';
+  static String displayName(ThermalPaper p) =>
+      p == ThermalPaper.mm80 ? '80 mm' : '58 mm';
 }
 
 /// BlueThermalHelper singleton
@@ -64,19 +62,19 @@ class BlueThermalHelper {
   static final BlueThermalHelper instance = BlueThermalHelper._internal();
 
   // Channels
-  final MethodChannel _method = const MethodChannel('blue_thermal_helper/methods');
+  final MethodChannel _method =
+      const MethodChannel('blue_thermal_helper/methods');
   final EventChannel _event = const EventChannel('blue_thermal_helper/events');
 
   // Events stream
   Stream<Map<String, dynamic>>? _eventsStream;
   Stream<Map<String, dynamic>> get events {
-    _eventsStream ??= _event.receiveBroadcastStream().map<Map<String, dynamic>>((dynamic e) {
+    _eventsStream ??=
+        _event.receiveBroadcastStream().map<Map<String, dynamic>>((dynamic e) {
       if (e is Map) {
         return Map<String, dynamic>.from(e);
       } else {
-        return <String, dynamic>{
-          'event': e.toString()
-        };
+        return <String, dynamic>{'event': e.toString()};
       }
     }).asBroadcastStream();
     return _eventsStream!;
@@ -89,14 +87,21 @@ class BlueThermalHelper {
   int get charsPerLine => ThermalPaperHelper.charsPerLine(_paper);
   PaperSize get paperSize => ThermalPaperHelper.paperSize(_paper);
 
+  Future<bool> isBluetoothOn() async {
+    final bool? res = await _method.invokeMethod<bool>('isBluetoothOn');
+    return res ?? false;
+  }
+
+  Future<void> requestEnableBluetooth() async {
+    await _method.invokeMethod('requestEnableBluetooth');
+  }
+
   // -------------------------
   // Basic MethodChannel wrappers
   // -------------------------
   Future<List<BluetoothPrinter>> scan({int timeout = 8}) async {
     try {
-      final res = await _method.invokeMethod('scan', {
-        'timeout': timeout
-      });
+      final res = await _method.invokeMethod('scan', {'timeout': timeout});
       if (res == null) return [];
       final list = res as List;
       return list.map((e) {
@@ -110,9 +115,7 @@ class BlueThermalHelper {
 
   Future<bool> connect(String mac) async {
     try {
-      final res = await _method.invokeMethod('connect', {
-        'mac': mac
-      });
+      final res = await _method.invokeMethod('connect', {'mac': mac});
       // plugin should return true on success
       return res == true;
     } on PlatformException {
@@ -140,9 +143,7 @@ class BlueThermalHelper {
   /// low-level write (send bytes to native)
   Future<void> printBytes(List<int> bytes) async {
     try {
-      await _method.invokeMethod('printBytes', {
-        'bytes': bytes
-      });
+      await _method.invokeMethod('printBytes', {'bytes': bytes});
     } on PlatformException {
       rethrow;
     }
@@ -230,9 +231,7 @@ class BlueThermalHelper {
 
   List<String> _wrapText(String text, int maxChars) {
     if (text.isEmpty) {
-      return [
-        ''
-      ];
+      return [''];
     }
     final words = text.split(RegExp(r'\s+'));
     final lines = <String>[];
@@ -288,7 +287,9 @@ class BlueThermalHelper {
     final leftLines = _wrapText(name, leftChars);
     final rightLines = _wrapText(priceText, rightChars);
 
-    final maxLines = leftLines.length > rightLines.length ? leftLines.length : rightLines.length;
+    final maxLines = leftLines.length > rightLines.length
+        ? leftLines.length
+        : rightLines.length;
 
     for (var i = 0; i < maxLines; i++) {
       final leftPart = (i < leftLines.length) ? leftLines[i] : '';
@@ -314,7 +315,9 @@ class BlueThermalHelper {
     required int charsPerLine,
   }) async {
     // logo
-    if (json.containsKey('logo') && json['logo'] is String && (json['logo'] as String).isNotEmpty) {
+    if (json.containsKey('logo') &&
+        json['logo'] is String &&
+        (json['logo'] as String).isNotEmpty) {
       try {
         await r.logo(json['logo'] as Uint8List);
       } catch (_) {}
@@ -324,7 +327,8 @@ class BlueThermalHelper {
     if (json.containsKey('header') && json['header'] is Map) {
       final h = json['header'] as Map<String, dynamic>;
       if (h.containsKey('title')) {
-        r.text(h['title'].toString(), bold: true, center: true, size: ThermalFontSize.large);
+        r.text(h['title'].toString(),
+            bold: true, center: true, size: ThermalFontSize.large);
       }
       if (h.containsKey('subtitle')) {
         r.text(h['subtitle'].toString(), center: true);
@@ -338,8 +342,12 @@ class BlueThermalHelper {
       for (var it in items) {
         if (it is Map<String, dynamic>) {
           final name = (it['name'] ?? '').toString();
-          final qty = (it['qty'] is num) ? (it['qty'] as num).toInt() : int.tryParse((it['qty'] ?? '0').toString()) ?? 0;
-          final price = (it['price'] is num) ? it['price'] as num : num.tryParse((it['price'] ?? '0').toString()) ?? 0;
+          final qty = (it['qty'] is num)
+              ? (it['qty'] as num).toInt()
+              : int.tryParse((it['qty'] ?? '0').toString()) ?? 0;
+          final price = (it['price'] is num)
+              ? it['price'] as num
+              : num.tryParse((it['price'] ?? '0').toString()) ?? 0;
 
           _rowItemAutoWrap(
             receipt: r,
@@ -349,7 +357,8 @@ class BlueThermalHelper {
             charsPerLine: charsPerLine,
           );
 
-          if (it.containsKey('note') && (it['note']?.toString().isNotEmpty ?? false)) {
+          if (it.containsKey('note') &&
+              (it['note']?.toString().isNotEmpty ?? false)) {
             r.note(it['note'].toString());
           }
         }
@@ -359,7 +368,8 @@ class BlueThermalHelper {
     // total
     if (json.containsKey('total')) {
       final totalVal = json['total'];
-      final totalNum = (totalVal is num) ? totalVal : num.tryParse(totalVal.toString()) ?? 0;
+      final totalNum =
+          (totalVal is num) ? totalVal : num.tryParse(totalVal.toString()) ?? 0;
       r.hr();
       r.rowColumns([
         r.col('TOTAL', 6, bold: true),
@@ -368,7 +378,8 @@ class BlueThermalHelper {
     }
 
     // footer
-    if (json.containsKey('footer') && (json['footer']?.toString().isNotEmpty ?? false)) {
+    if (json.containsKey('footer') &&
+        (json['footer']?.toString().isNotEmpty ?? false)) {
       r.feed(1);
       r.text(json['footer'].toString(), center: true);
     }
