@@ -1,7 +1,3 @@
-# Versioning & Changelog
-
-Dokumen ini menjelaskan skema versioning dan contoh CHANGELOG untuk package **blue_thermal_helper**.
-
 # Changelog
 
 ## [1.0.0] - 2026-01-06
@@ -29,12 +25,18 @@ Dokumen ini menjelaskan skema versioning dan contoh CHANGELOG untuk package **bl
 - Initial public release
 - Tested with 58mm thermal printer
 
-### ✅ Compatibility #
+### ✅ Compatibility
 
 Tested on Flutter 3.38.5 with real android devices Oppo Reno 14 and PANDA Thermal Printer PRJ-R58B
 
 ## [1.0.1]
 
-### Update
+- Update README
+
+## [1.0.2]
 
 - Update README
+
+## [1.0.3]
+
+- Bug Fix Logo Function

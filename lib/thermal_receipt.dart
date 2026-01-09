@@ -1,7 +1,6 @@
 // lib/thermal_receipt.dart
-import 'dart:developer';
 
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/foundation.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:image/image.dart' as img;
 
@@ -105,12 +104,12 @@ class ReceiptPreview {
 /// - Holds bytes list
 /// - Keeps preview buffer in sync
 class ThermalReceipt {
-  final Generator _gen;
+  final Generator _generator;
   final List<int> _bytes = [];
   final ReceiptPreview _preview = ReceiptPreview();
   final PaperSize paperSize;
 
-  ThermalReceipt._(this._gen, this.paperSize);
+  ThermalReceipt._(this._generator, this.paperSize);
 
   /// factory: create generator by loading capability profile
   static Future<ThermalReceipt> create({
@@ -132,97 +131,28 @@ class ThermalReceipt {
   // -----------------------
   /// Insert image from asset (resize automatically)
   /// `assetPath`: path in assets, e.g. 'assets/logo.png'
+  /// Replace existing logo(...) implementation with this one.
+  /// Expects `charsPerLine`, `_generator`, `_bytes`, and `_preview` to exist in the class.
   Future<void> logo(
-    String assetPath, {
-    PosAlign align = PosAlign.center,
-  }) async {
-    try {
-      // 1. Load asset
-      final data = await rootBundle.load(assetPath);
-      final raw = data.buffer.asUint8List();
+  Uint8List bytes, {
+  PosAlign align = PosAlign.center,
+}) async {
+  try {
+    final image = img.decodeImage(bytes);
+    if (image == null) return;
 
-      // 2. Decode image
-      final decoded = img.decodeImage(raw);
-      if (decoded == null) {
-        log('logo(): decodeImage failed');
-        return;
-      }
-
-      img.Image image = decoded;
-
-      // 3. Flatten transparency (RGBA -> RGB white background)
-      if (image.hasAlpha) {
-        final bg = img.Image(
-          width: image.width,
-          height: image.height,
-          numChannels: 3,
-        );
-
-        // fill background white
-        for (final p in bg) {
-          p
-            ..r = 255
-            ..g = 255
-            ..b = 255;
-        }
-
-        // draw original onto white background
-        img.compositeImage(bg, image);
-        image = bg;
-      }
-
-      // 4. Convert to grayscale
-      image = img.grayscale(image);
-
-      // 5. Resize to paper width
-      final maxWidth = _paperMaxWidth(paperSize);
-      if (maxWidth <= 0) {
-        log('logo(): invalid paper width');
-        return;
-      }
-
-      if (image.width > maxWidth) {
-        image = img.copyResize(image, width: maxWidth);
-      }
-
-      // 6. Manual threshold (BLACK / WHITE) — API 4.x
-      const int threshold = 128;
-      for (final p in image) {
-        final luminance = p.r; // grayscale → r=g=b
-        if (luminance < threshold) {
-          p
-            ..r = 0
-            ..g = 0
-            ..b = 0;
-        } else {
-          p
-            ..r = 255
-            ..g = 255
-            ..b = 255;
-        }
-      }
-
-      // 7. Generate ESC/POS bytes
-      final imageBytes = _gen.image(image, align: align);
-      if (imageBytes.isEmpty) {
-        log('logo(): generator returned empty bytes');
-        return;
-      }
-
-      // 8. Append to printer buffer
-      _bytes.addAll(imageBytes);
-      _bytes.addAll(_gen.feed(1));
-
-      _preview.text('[LOGO]', center: true);
-
-      log(
-        'logo(): OK | size=${image.width}x${image.height} | bytes=${imageBytes.length}',
-      );
-    } catch (e, s) {
-      log('logo(): EXCEPTION $e');
-      log(s.toString());
-    }
+    // langsung kirim ke generator
+    _bytes.addAll(
+      _generator.image(
+        image,
+        align: align,
+      ),
+    );
+  } catch (_) {
+    // silent fail → receipt tetap lanjut
   }
+}
+
 
   /// Helper to determine a reasonable max width per paper size
   int _paperMaxWidth(PaperSize paper) {
@@ -253,25 +183,25 @@ class ThermalReceipt {
       align: center ? PosAlign.center : PosAlign.left,
     );
 
-    _bytes.addAll(_gen.text(text, styles: styles));
+    _bytes.addAll(_generator.text(text, styles: styles));
     _preview.text(text, center: center);
   }
 
   /// Convenience: horizontal rule
   void hr([int width = 32]) {
-    _bytes.addAll(_gen.hr());
+    _bytes.addAll(_generator.hr());
     _preview.hr(width);
   }
 
   /// feed n lines
   void feed([int n = 1]) {
-    _bytes.addAll(_gen.feed(n));
+    _bytes.addAll(_generator.feed(n));
     _preview.feed(n);
   }
 
   /// cut paper
   void cut() {
-    _bytes.addAll(_gen.cut());
+    _bytes.addAll(_generator.cut());
     _preview.cut();
   }
 
@@ -281,7 +211,7 @@ class ThermalReceipt {
 
   /// Generic row that accepts PosColumn list (full control)
   void rowColumns(List<PosColumn> columns) {
-    _bytes.addAll(_gen.row(columns));
+    _bytes.addAll(_generator.row(columns));
     // For preview: try to create simple left-right for 2-col case
     if (columns.length == 2) {
       final left = columns[0].text;
@@ -375,8 +305,8 @@ class ThermalReceipt {
   // -----------------------
   void note(String text) {
     // print indented line with prefix
-    _bytes.addAll(
-        _gen.text('  - $text', styles: const PosStyles(align: PosAlign.left)));
+    _bytes.addAll(_generator.text('  - $text',
+        styles: const PosStyles(align: PosAlign.left)));
     _preview.text('  > $text');
   }
 }

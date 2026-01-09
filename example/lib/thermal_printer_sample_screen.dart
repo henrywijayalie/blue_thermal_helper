@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:blue_thermal_helper/blue_thermal_helper.dart';
 import 'package:blue_thermal_helper/thermal_receipt.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Debug Screen – Thermal Printer Bluetooth
 /// Fitur:
@@ -183,9 +184,11 @@ class _ThermalPrinterSampleScreenState
   Future<void> _buildReceipt(
     ThermalReceipt r,
   ) async {
-    await r.logo(
-      'assets/mpos.jpeg',
-    ); // optional
+    ByteData bytesAsset = await rootBundle.load("assets/logo_header3.png");
+    Uint8List imageBytesFromAsset = bytesAsset.buffer
+        .asUint8List(bytesAsset.offsetInBytes, bytesAsset.lengthInBytes);
+
+    await r.logo(imageBytesFromAsset); // optional
 
     r.text(
       'Iga Bakar Rempah',

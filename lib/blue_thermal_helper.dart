@@ -316,7 +316,7 @@ class BlueThermalHelper {
     // logo
     if (json.containsKey('logo') && json['logo'] is String && (json['logo'] as String).isNotEmpty) {
       try {
-        await r.logo(json['logo'] as String);
+        await r.logo(json['logo'] as Uint8List);
       } catch (_) {}
     }
 

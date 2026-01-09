@@ -1,4 +1,6 @@
 // lib/receipt_utils.dart
+import 'dart:typed_data';
+
 import 'package:blue_thermal_helper/thermal_receipt.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 // import ThermalReceipt, ThermalFontSize, PosAlign if needed
@@ -121,9 +123,9 @@ void rowItemAutoWrap({
 /// }
 Future<void> buildReceiptFromJson(ThermalReceipt r, Map<String, dynamic> json, {int charsPerLine = 32}) async {
   // logo
-  if (json.containsKey('logo') && json['logo'] is String) {
+  if (json.containsKey('logo') && json['logo'] is Uint8List) {
     try {
-      await r.logo(json['logo'] as String);
+      await r.logo(json['logo'] as Uint8List);
     } catch (_) {
       // ignore if logo fails
     }
