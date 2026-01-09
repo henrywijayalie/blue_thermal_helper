@@ -154,17 +154,17 @@ class ThermalReceipt {
 }
 
 
-  /// Helper to determine a reasonable max width per paper size
-  int _paperMaxWidth(PaperSize paper) {
-    // conservative defaults (common printers)
-    switch (paper) {
-      case PaperSize.mm80:
-        return 576; // typical 80mm at 203 dpi
-      case PaperSize.mm58:
-      default:
-        return 384; // typical 58mm at 203 dpi
-    }
-  }
+  // /// Helper to determine a reasonable max width per paper size
+  // int _paperMaxWidth(PaperSize paper) {
+  //   // conservative defaults (common printers)
+  //   switch (paper) {
+  //     case PaperSize.mm80:
+  //       return 576; // typical 80mm at 203 dpi
+  //     case PaperSize.mm58:
+  //     default:
+  //       return 384; // typical 58mm at 203 dpi
+  //   }
+  // }
 
   // -----------------------
   // TEXT / LAYOUT
