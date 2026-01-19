@@ -325,7 +325,11 @@ r.note('Pedas sekali');
 ### logo
 
 ```dart
-await r.logo('assets/logo.png');
+ByteData bytesAsset = await rootBundle.load("assets/logo_header3.png");
+
+Uint8List imageBytesFromAsset = bytesAsset.buffer.asUint8List(bytesAsset.offsetInBytes, bytesAsset.lengthInBytes);
+
+await r.logo(imageBytesFromAsset);
 ```
 
 ### feed & cut
