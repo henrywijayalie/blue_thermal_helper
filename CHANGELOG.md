@@ -44,3 +44,7 @@ Tested on Flutter 3.38.5 with real android devices Oppo Reno 14 and PANDA Therma
 ## [1.0.4]
 
 - Add Request Enabling Bluetooth ON
+
+## [1.0.4+1]
+
+- Update README
