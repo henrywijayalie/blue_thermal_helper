@@ -15,6 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Allows more flexible formatting of two-column rows without using `rowColumns()` directly
   - Example: `receipt.row('Total', '100000', bold: true, size: ThermalFontSize.large)`
 
+### Fixed
+
+- **Text Wrapping Issue for Long Values**
+  - Fixed issue where long values (e.g., reference numbers 20+ chars) in `row()` method would wrap to next line
+  - Changed column width allocation from 6-6 to 4-8 split for small/normal fonts
+  - Gives maximum space to value column (right side) to accommodate very long text
+  - Large fonts use 5-7 split to balance space with larger character size
+  - Ensures label and value stay on the same line even with very long values (up to ~26 characters on 58mm paper)
+
 ---
 
 ## [1.0.6] - 2026-01-22
