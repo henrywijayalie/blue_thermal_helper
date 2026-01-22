@@ -289,7 +289,7 @@ class ThermalReceipt {
     ThermalFontSize size = ThermalFontSize.normal,
   }) {
     // Adjust width allocation to prevent text wrapping for long values
-    // Use 4-8 split to give maximum space to value column (right side)
+    // Use 3-9 split to give maximum space to value column (right side)
     // This prevents long values like reference numbers from wrapping
     int leftWidth, rightWidth;
 
@@ -297,15 +297,15 @@ class ThermalReceipt {
       case ThermalFontSize.extraSmall:
       case ThermalFontSize.small:
       case ThermalFontSize.normal:
-        // Use 4-8 split: maximum space for value to prevent wrapping
-        // Suitable for long values like reference numbers (20+ chars)
-        leftWidth = 4;
-        rightWidth = 8;
+        // Use 3-9 split: maximum space for value to prevent wrapping
+        // Suitable for very long values like reference numbers (23+ chars)
+        leftWidth = 3;
+        rightWidth = 9;
         break;
       case ThermalFontSize.large:
-        // Large size: characters are 2x bigger, use 5-7 split
-        leftWidth = 5;
-        rightWidth = 7;
+        // Large size: characters are 2x bigger, use 4-8 split
+        leftWidth = 4;
+        rightWidth = 8;
         break;
     }
 

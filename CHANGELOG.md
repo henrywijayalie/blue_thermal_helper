@@ -10,11 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **Text Wrapping Issue for Long Values**
-  - Fixed critical issue where long values (e.g., reference numbers 20+ chars) in `row()` method would wrap to next line
-  - Changed column width allocation from 6-6 to 4-8 split for small/normal fonts
+  - Fixed critical issue where long values (e.g., reference numbers 23+ chars) in `row()` method would wrap to next line
+  - Changed column width allocation from 6-6 to 3-9 split for small/normal fonts
   - Gives maximum space to value column (right side) to accommodate very long text
-  - Large fonts use 5-7 split to balance space with larger character size
-  - Ensures label and value stay on the same line even with very long values (up to ~26 characters on 58mm paper)
+  - Large fonts use 4-8 split to balance space with larger character size
+  - Ensures label and value stay on the same line even with very long values (up to ~30 characters on 58mm paper)
   - Resolves regression introduced when adding `size` parameter to `row()` method
 
 ---
