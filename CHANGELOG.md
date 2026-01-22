@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2026-01-22
+
+### Fixed
+
+- **Further Adjustment for Text Wrapping**
+  - Adjusted column split from 4-8 to 3-9 for small/normal fonts
+  - Prevents last digit from wrapping to next line for very long values
+  - Supports values up to ~30 characters on 58mm paper without any wrapping
+  - Large fonts use 4-8 split
+
+---
+
 ## [1.0.8] - 2026-01-22
 
 ### Fixed
