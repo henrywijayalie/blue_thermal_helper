@@ -81,13 +81,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Auto-wrap item name
 - Print receipt from JSON data
 
-### Fixed
+### Bug Fixes
 
 - Preview width mismatch with 58mm paper
 - Money column alignment edge cases
 - Connection status not updating in UI
 
-### Notes
+### Release Notes
 
 - Initial public release
 - Tested with 58mm thermal printer
