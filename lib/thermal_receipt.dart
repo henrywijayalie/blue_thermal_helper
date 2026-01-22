@@ -6,6 +6,7 @@ import 'package:image/image.dart' as img;
 
 /// Enum sederhana untuk ukuran teks logis
 enum ThermalFontSize {
+  extraSmall, // Ukuran ekstra kecil untuk konten yang padat
   small,
   normal,
   large,
@@ -40,6 +41,16 @@ class ThermalFontMapper {
     PosAlign align = PosAlign.left,
   }) {
     switch (size) {
+      case ThermalFontSize.extraSmall:
+        // Ukuran ekstra kecil: gunakan font alternatif (fontB) jika tersedia
+        // atau tetap size1 dengan bold=false untuk tampilan lebih kecil
+        return PosStyles(
+          bold: false, // Paksa non-bold untuk tampilan lebih ringan
+          align: align,
+          height: PosTextSize.size1,
+          width: PosTextSize.size1,
+          fontType: PosFontType.fontB, // Font alternatif yang lebih kecil
+        );
       case ThermalFontSize.small:
         return PosStyles(
           bold: bold,
@@ -134,25 +145,24 @@ class ThermalReceipt {
   /// Replace existing logo(...) implementation with this one.
   /// Expects `charsPerLine`, `_generator`, `_bytes`, and `_preview` to exist in the class.
   Future<void> logo(
-  Uint8List bytes, {
-  PosAlign align = PosAlign.center,
-}) async {
-  try {
-    final image = img.decodeImage(bytes);
-    if (image == null) return;
+    Uint8List bytes, {
+    PosAlign align = PosAlign.center,
+  }) async {
+    try {
+      final image = img.decodeImage(bytes);
+      if (image == null) return;
 
-    // langsung kirim ke generator
-    _bytes.addAll(
-      _generator.image(
-        image,
-        align: align,
-      ),
-    );
-  } catch (_) {
-    // silent fail → receipt tetap lanjut
+      // langsung kirim ke generator
+      _bytes.addAll(
+        _generator.image(
+          image,
+          align: align,
+        ),
+      );
+    } catch (_) {
+      // silent fail → receipt tetap lanjut
+    }
   }
-}
-
 
   // /// Helper to determine a reasonable max width per paper size
   // int _paperMaxWidth(PaperSize paper) {

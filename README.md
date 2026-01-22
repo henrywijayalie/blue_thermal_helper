@@ -70,6 +70,7 @@ Bluetooth Printer
 `BlueThermalHelper` adalah **single source of truth**.
 
 ---
+
 ## Initial Helper
 
 ```dart
@@ -245,6 +246,34 @@ Kelebihan:
 
 ## ThermalReceipt API
 
+### Font Sizes
+
+Plugin ini mendukung 4 ukuran font:
+
+```dart
+enum ThermalFontSize {
+  extraSmall,  // Font ekstra kecil (menggunakan fontB)
+  small,       // Font kecil
+  normal,      // Font normal (default)
+  large,       // Font besar
+}
+```
+
+Contoh penggunaan:
+
+```dart
+// Font ekstra kecil untuk informasi detail
+r.text('Alamat lengkap toko', size: ThermalFontSize.extraSmall);
+
+// Font normal untuk konten utama
+r.text('Nama Item', size: ThermalFontSize.normal);
+
+// Font besar untuk header
+r.text('TOKO SAYA', size: ThermalFontSize.large, bold: true);
+```
+
+**Catatan:** `ThermalFontSize.extraSmall` menggunakan font alternatif (fontB) yang lebih kecil dari ukuran standar. Ini berguna untuk mencetak informasi detail seperti alamat panjang, catatan kaki, atau disclaimer pada ruang terbatas.
+
 ### rowItem (AUTO-WRAP ITEM + MONEY ALIGN)
 
 Method khusus untuk mencetak item transaksi (nama + qty x harga) dengan:
@@ -375,9 +404,10 @@ Alignment otomatis berdasarkan chars-per-line.
 
 ## Penutup
 
-### ✅ Compatibility #
+### ✅ Compatibility
 
 Tested on Flutter 3.38.5 with real android devices Oppo Reno 14 and PANDA Thermal Printer PRJ-R58B
 
-### Additional information #
+### Additional information
+
 This is Just The Initial Version feel free to Contribute or Report any Bug!

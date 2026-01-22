@@ -148,6 +148,8 @@ class _ThermalPrinterSampleScreenState
       'Pakulonan, Kec. Serpong Utara\n'
       'Kota Tangerang Selatan, Banten 15325',
       center: true,
+      size:
+          ThermalFontSize.extraSmall, // Gunakan font ekstra kecil untuk alamat
     );
 
     r.hr();
@@ -185,6 +187,12 @@ class _ThermalPrinterSampleScreenState
     // Footer
     r.feed(2);
     r.text('Terima Kasih', center: true);
+    r.feed(1);
+    r.text(
+      'Powered by Blue Thermal Helper',
+      center: true,
+      size: ThermalFontSize.extraSmall, // Contoh penggunaan font ekstra kecil
+    );
     r.cut();
   }
 
