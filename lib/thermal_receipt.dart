@@ -282,11 +282,15 @@ class ThermalReceipt {
   }
 
   /// Convenience for common 2-column usage
-  void row(String left, String right, {bool bold = false}) {
+  void row(
+    String left,
+    String right, {
+    bool bold = false,
+    ThermalFontSize size = ThermalFontSize.normal,
+  }) {
     rowColumns([
-      col(left, 6, size: ThermalFontSize.normal, bold: bold),
-      col(right, 6,
-          size: ThermalFontSize.normal, bold: bold, align: PosAlign.right),
+      col(left, 6, size: size, bold: bold),
+      col(right, 6, size: size, bold: bold, align: PosAlign.right),
     ]);
   }
 

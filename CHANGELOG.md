@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2026-01-22
+
+### Added
+
+- **Enhanced `row()` Method**
+  - Added optional `bold` parameter to `row()` method for bold text styling
+  - Added optional `size` parameter to `row()` method for font size control (using `ThermalFontSize` enum)
+  - Allows more flexible formatting of two-column rows without using `rowColumns()` directly
+  - Example: `receipt.row('Total', '100000', bold: true, size: ThermalFontSize.large)`
+
+---
+
 ## [1.0.6] - 2026-01-22
 
 ### Added
