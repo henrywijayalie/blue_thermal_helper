@@ -1,6 +1,7 @@
 // lib/src/models/thermal_paper.dart
 
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'font_size.dart';
 
 /// Supported thermal paper sizes.
 ///
@@ -67,6 +68,35 @@ class ThermalPaperHelper {
       case ThermalPaper.mm58:
         return 32;
     }
+  }
+
+  /// Returns the estimated number of characters per line for the given paper size and font size.
+  ///
+  /// This method calculates the number of characters that can fit in a line
+  /// based on the font size multiplier. Larger fonts consume more horizontal space.
+  ///
+  /// Formula: baseChars / widthMultiplier
+  ///
+  /// Example:
+  /// ```dart
+  /// // Default font (10pt, 1x multiplier): 32 chars
+  /// final chars1 = ThermalPaperHelper.charsPerLineWithFont(
+  ///   ThermalPaper.mm58,
+  ///   FontSize.normal,
+  /// );
+  /// print(chars1); // 32
+  ///
+  /// // Double size font (16pt, 2x multiplier): 16 chars
+  /// final chars2 = ThermalPaperHelper.charsPerLineWithFont(
+  ///   ThermalPaper.mm58,
+  ///   FontSize.large,
+  /// );
+  /// print(chars2); // 16
+  /// ```
+  static int charsPerLineWithFont(ThermalPaper paper, FontSize fontSize) {
+    final baseChars = charsPerLine(paper);
+    final widthMultiplier = fontSize.getWidthMultiplier();
+    return (baseChars / widthMultiplier).round();
   }
 
   /// Maps [ThermalPaper] enum to [PaperSize] from esc_pos_utils_plus.

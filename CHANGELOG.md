@@ -4,7 +4,88 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.0.0] - 2026-02-03
 
+### Added
+
+- **FontSize Manual System** ⭐
+  - Manual font size control with range 6pt-32pt
+  - 7 preset sizes (extraSmall, small, normal, medium, large, extraLarge, header)
+  - Support custom font sizes with decimal precision (e.g., FontSize(14.5))
+  - Automatic ESC/POS multiplier calculation
+  - New model: `FontSize` class in `lib/src/models/font_size.dart`
+  - Method `getCharsPerLine58mm()`, `getCharsPerLine80mm()` for dynamic text wrapping
+  - Method `getPixelWidth58mm()`, `getPixelWidth80mm()` for image calculations
+
+- **Smart Row Alignment** ⭐
+  - New method: `rowLabel(String label, String value, {FontSize size, bool bold})`
+  - New method: `rowLabelCustom(String label, String value, {int labelWidth, FontSize size, bool bold})`
+  - Auto-alignment of ":" separator to be vertically consistent
+  - Professional-looking formatted rows similar to text editors
+
+- **ThermalPaperHelper Enhancement**
+  - New method: `charsPerLineWithFont(ThermalPaper paper, FontSize fontSize)`
+  - Dynamic character calculation based on font size
+
+- **Comprehensive Documentation**
+  - FONTSIZE_GUIDE.md - Complete guide in Indonesian
+  - QUICKREFERENCE.md - Quick cheat sheet with 15 sections
+  - IMPLEMENTATION_SUMMARY.md - Technical implementation details
+  - COMPLETION_CHECKLIST.md - Project status and checklist
+  - DOCUMENTATION_INDEX.md - Documentation index and learning paths
+  - Updated README.md with new features
+
+- **Code Examples**
+  - font_size_demo.dart - 3 comprehensive demo functions
+  - font_size_example_simple.dart - Simple UI reference with 6 examples
+  - Updated thermal_printer_sample_screen.dart with new features
+
+### Changed
+
+- **BREAKING CHANGE**: Removed enum `ThermalFontSize`
+  - Replaced with flexible `FontSize` model (6pt-32pt range)
+  - All method signatures using `ThermalFontSize` updated to use `FontSize`
+  - Migration is straightforward: `ThermalFontSize.large` → `FontSize.large`
+
+- Updated `ThermalFontMapper.style()` for manual ESC/POS calculation
+  - Now converts FontSize point values to appropriate width/height multipliers
+  - Supports up to 4x multiplier (standard thermal printer limit)
+
+- Updated method signatures:
+  - `text()` - parameter `size` now accepts `FontSize` instead of `ThermalFontSize`
+  - `col()` - parameter `size` updated
+  - `colAuto()` - parameter `size` updated
+  - `row()` - parameter `size` updated, smarter width allocation based on font multiplier
+  - `rowItem()` - parameter `size` updated
+
+### Improved
+
+- Better hierarchy support with 7 preset font sizes
+- More professional receipt formatting with smart alignment
+- Better documentation with Indonesian language guide
+- More flexible font size control without preset limitations
+- Automatic calculation reduces manual configuration
+
+### Migration Guide
+
+For users upgrading from v1.x to v2.0:
+
+```dart
+// OLD (v1.1.0 and before)
+receipt.text('Text', size: ThermalFontSize.large);
+receipt.row('Label', 'Value', size: ThermalFontSize.normal);
+
+// NEW (v2.0.0)
+receipt.text('Text', size: FontSize.large);
+receipt.row('Label', 'Value', size: FontSize.normal);
+
+// NEW: Use rowLabel() for better alignment
+receipt.rowLabel('Label', 'Value');
+```
+
+See [FONTSIZE_GUIDE.md](FONTSIZE_GUIDE.md) section "Migrasi dari Versi Lama" for detailed migration guide.
+
+---
 ## [1.0.9] - 2026-01-22
 
 ### Fixed

@@ -102,6 +102,73 @@ Efeknya:
 
 ---
 
+## ✨ FontSize Manual (NEW in v2.0)
+
+Sistem **FontSize Manual** memungkinkan Anda menentukan ukuran teks secara spesifik (6pt-32pt), mirip dengan Microsoft Word atau text editor profesional.
+
+### Menggunakan Preset FontSize
+
+```dart
+final receipt = await ThermalReceipt.create();
+
+receipt.text('Header 24pt', bold: true, center: true, size: FontSize.header);
+receipt.text('Subheader 16pt', size: FontSize.large);
+receipt.text('Body text 10pt', size: FontSize.normal);
+receipt.text('Detail 8pt', size: FontSize.small);
+```
+
+### Preset FontSize yang Tersedia
+
+- `FontSize.extraSmall` → 6pt
+- `FontSize.small` → 8pt
+- `FontSize.normal` → 10pt (default)
+- `FontSize.medium` → 12pt
+- `FontSize.large` → 16pt
+- `FontSize.extraLarge` → 20pt
+- `FontSize.header` → 24pt
+
+### Custom FontSize
+
+```dart
+receipt.text('Custom 14pt', size: FontSize(14.0));
+receipt.text('Custom 11.5pt', size: FontSize(11.5));
+```
+
+Rentang yang didukung: **6pt - 32pt**
+
+---
+
+## ✨ Smart Row Alignment (NEW in v2.0)
+
+Fitur baru `rowLabel()` membuat tanda `:` selaras vertikal secara otomatis:
+
+```dart
+receipt.rowLabel('Nama Pelanggan', 'John Doe');
+receipt.rowLabel('Email', 'john@example.com');
+receipt.rowLabel('No. HP', '08123456789');
+```
+
+**Output** (tanda : selaras otomatis):
+
+```
+Nama Pelanggan : John Doe
+Email          : john@example.com
+No. HP         : 08123456789
+```
+
+---
+
+## 📖 Dokumentasi FontSize
+
+Untuk dokumentasi lengkap tentang FontSize dan fitur-fitur baru lainnya:
+
+- **Quick Start**: Baca [QUICKREFERENCE.md](QUICKREFERENCE.md)
+- **Dokumentasi Lengkap**: Baca [FONTSIZE_GUIDE.md](FONTSIZE_GUIDE.md)
+- **Index Dokumentasi**: Lihat [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)
+- **Contoh Code**: Lihat [example/lib/font_size_demo.dart](example/lib/font_size_demo.dart)
+
+---
+
 ## Scan Printer
 
 ```dart

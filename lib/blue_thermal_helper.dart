@@ -7,11 +7,13 @@ import 'package:flutter/services.dart';
 // Public API exports
 export 'src/models/bluetooth_printer.dart';
 export 'src/models/thermal_paper.dart';
+export 'src/models/font_size.dart';
 export 'thermal_receipt.dart';
 
 // Internal imports (not exported)
 import 'src/models/bluetooth_printer.dart';
 import 'src/models/thermal_paper.dart';
+import 'src/models/font_size.dart';
 import 'src/utils/formatting_utils.dart' as utils;
 import 'thermal_receipt.dart';
 
@@ -435,7 +437,7 @@ class BlueThermalHelper {
     required int charsPerLine,
     int leftCols = 7,
     int rightCols = 5,
-    ThermalFontSize size = ThermalFontSize.normal,
+    FontSize size = FontSize.normal,
   }) {
     final totalCols = leftCols + rightCols;
     final leftChars = (charsPerLine * leftCols / totalCols).floor();
@@ -490,7 +492,7 @@ class BlueThermalHelper {
       final h = json['header'] as Map<String, dynamic>;
       if (h.containsKey('title')) {
         r.text(h['title'].toString(),
-            bold: true, center: true, size: ThermalFontSize.large);
+            bold: true, center: true, size: FontSize.large);
       }
       if (h.containsKey('subtitle')) {
         r.text(h['subtitle'].toString(), center: true);

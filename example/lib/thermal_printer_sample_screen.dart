@@ -129,18 +129,18 @@ class _ThermalPrinterSampleScreenState
 
   Future<void> _buildReceipt(ThermalReceipt r) async {
     // Load logo from assets
-    ByteData bytesAsset = await rootBundle.load("assets/logo_header3.png");
-    Uint8List imageBytesFromAsset = bytesAsset.buffer
-        .asUint8List(bytesAsset.offsetInBytes, bytesAsset.lengthInBytes);
+    // ByteData bytesAsset = await rootBundle.load("assets/logo_header3.png");
+    // Uint8List imageBytesFromAsset = bytesAsset.buffer
+    //     .asUint8List(bytesAsset.offsetInBytes, bytesAsset.lengthInBytes);
 
-    await r.logo(imageBytesFromAsset);
+    // await r.logo(imageBytesFromAsset);
 
     // Header
     r.text(
       'Iga Bakar Rempah',
       bold: true,
       center: true,
-      size: ThermalFontSize.large,
+      size: FontSize.header, // Ganti dari ThermalFontSize.large ke FontSize.header (24pt)
     );
 
     r.text(
@@ -148,8 +148,7 @@ class _ThermalPrinterSampleScreenState
       'Pakulonan, Kec. Serpong Utara\n'
       'Kota Tangerang Selatan, Banten 15325',
       center: true,
-      size:
-          ThermalFontSize.extraSmall, // Gunakan font ekstra kecil untuk alamat
+      size: FontSize.small, // Ganti dari ThermalFontSize.extraSmall ke FontSize.small (8pt)
     );
 
     r.hr();
@@ -184,14 +183,20 @@ class _ThermalPrinterSampleScreenState
       ),
     ]);
 
-    // Footer
+    // Footer dengan smart row alignment
     r.feed(2);
     r.text('Terima Kasih', center: true);
     r.feed(1);
+    
+    // Contoh penggunaan rowLabel
+    r.rowLabel('Tanggal', '2026-02-03', size: FontSize.small);
+    r.rowLabel('Waktu', '14:30:45', size: FontSize.small);
+    
+    r.feed(1);
     r.text(
-      'Powered by Blue Thermal Helper',
+      'Powered by Blue Thermal Helper v2.0',
       center: true,
-      size: ThermalFontSize.extraSmall, // Contoh penggunaan font ekstra kecil
+      size: FontSize.extraSmall, // 6pt - font terkecil
     );
     r.cut();
   }

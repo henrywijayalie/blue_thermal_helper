@@ -3,14 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:image/image.dart' as img;
-
-/// Enum sederhana untuk ukuran teks logis
-enum ThermalFontSize {
-  extraSmall, // Ukuran ekstra kecil untuk konten yang padat
-  small,
-  normal,
-  large,
-}
+import 'src/models/font_size.dart';
 
 enum ReceiptTextType {
   text,
@@ -33,47 +26,67 @@ String formatMoney(num value) {
   return buf.toString().split('').reversed.join();
 }
 
-/// Mapping ukuran logis ke PosStyles (abstraksi)
+/// Mapper untuk mengkonversi FontSize ke PosStyles
+/// Melakukan perhitungan manual berdasarkan ukuran font dalam points
 class ThermalFontMapper {
+  /// Menghasilkan PosStyles berdasarkan FontSize
+  /// 
+  /// Parameters:
+  /// - [size]: Ukuran font dalam point (6pt-32pt)
+  /// - [bold]: Apakah teks bold
+  /// - [align]: Alignment teks (left, center, right)
+  /// 
+  /// Returns: PosStyles yang dikonfigurasi sesuai ukuran font
   static PosStyles style(
-    ThermalFontSize size, {
+    FontSize size, {
     bool bold = false,
     PosAlign align = PosAlign.left,
   }) {
-    switch (size) {
-      case ThermalFontSize.extraSmall:
-        // Ukuran ekstra kecil: gunakan font alternatif (fontB) jika tersedia
-        // atau tetap size1 dengan bold=false untuk tampilan lebih kecil
-        return PosStyles(
-          bold: false, // Paksa non-bold untuk tampilan lebih ringan
-          align: align,
-          height: PosTextSize.size1,
-          width: PosTextSize.size1,
-          fontType: PosFontType.fontB, // Font alternatif yang lebih kecil
-        );
-      case ThermalFontSize.small:
-        return PosStyles(
-          bold: bold,
-          align: align,
-          height: PosTextSize.size1,
-          width: PosTextSize.size1,
-        );
-      case ThermalFontSize.large:
-        // Many printers only support up to size2; use size2 for large
-        return PosStyles(
-          bold: bold,
-          align: align,
-          height: PosTextSize.size2,
-          width: PosTextSize.size2,
-        );
-      case ThermalFontSize.normal:
-        return PosStyles(
-          bold: bold,
-          align: align,
-          height: PosTextSize.size1,
-          width: PosTextSize.size1,
-        );
+    final widthMultiplier = size.getWidthMultiplier();
+    final heightMultiplier = size.getHeightMultiplier();
+
+    // Konversi multiplier ke PosTextSize
+    final PosTextSize posWidth;
+    final PosTextSize posHeight;
+
+    switch (widthMultiplier) {
+      case 1:
+        posWidth = PosTextSize.size1;
+        break;
+      case 2:
+        posWidth = PosTextSize.size2;
+        break;
+      case 3:
+        posWidth = PosTextSize.size3;
+        break;
+      case 4:
+      default:
+        posWidth = PosTextSize.size4;
+        break;
     }
+
+    switch (heightMultiplier) {
+      case 1:
+        posHeight = PosTextSize.size1;
+        break;
+      case 2:
+        posHeight = PosTextSize.size2;
+        break;
+      case 3:
+        posHeight = PosTextSize.size3;
+        break;
+      case 4:
+      default:
+        posHeight = PosTextSize.size4;
+        break;
+    }
+
+    return PosStyles(
+      bold: bold,
+      align: align,
+      height: posHeight,
+      width: posWidth,
+    );
   }
 }
 
@@ -183,7 +196,7 @@ class ThermalReceipt {
   /// Generic text with logical font size + alignment
   void text(
     String text, {
-    ThermalFontSize size = ThermalFontSize.normal,
+    FontSize size = FontSize.normal,
     bool bold = false,
     bool center = false,
   }) {
@@ -238,7 +251,7 @@ class ThermalReceipt {
   PosColumn col(
     String text,
     int width, {
-    ThermalFontSize size = ThermalFontSize.normal,
+    FontSize size = FontSize.normal,
     bool bold = false,
     PosAlign align = PosAlign.left,
   }) {
@@ -253,7 +266,7 @@ class ThermalReceipt {
     dynamic value,
     int width, {
     ReceiptTextType type = ReceiptTextType.text,
-    ThermalFontSize size = ThermalFontSize.normal,
+    FontSize size = FontSize.normal,
     bool bold = false,
     PosAlign align = PosAlign.left,
   }) {
@@ -286,28 +299,17 @@ class ThermalReceipt {
     String left,
     String right, {
     bool bold = false,
-    ThermalFontSize size = ThermalFontSize.normal,
+    FontSize size = FontSize.normal,
   }) {
     // Adjust width allocation to prevent text wrapping for long values
-    // Use 3-9 split to give maximum space to value column (right side)
-    // This prevents long values like reference numbers from wrapping
-    int leftWidth, rightWidth;
-
-    switch (size) {
-      case ThermalFontSize.extraSmall:
-      case ThermalFontSize.small:
-      case ThermalFontSize.normal:
-        // Use 3-9 split: maximum space for value to prevent wrapping
-        // Suitable for very long values like reference numbers (23+ chars)
-        leftWidth = 3;
-        rightWidth = 9;
-        break;
-      case ThermalFontSize.large:
-        // Large size: characters are 2x bigger, use 4-8 split
-        leftWidth = 4;
-        rightWidth = 8;
-        break;
-    }
+    // Gunakan dynamic width berdasarkan font size multiplier
+    final widthMul = size.getWidthMultiplier();
+    final baseLabelWidth = 3;
+    final baseValueWidth = 9;
+    
+    // Sesuaikan lebar berdasarkan multiplier
+    final leftWidth = (baseLabelWidth * (5 - widthMul)).round().clamp(2, 8);
+    final rightWidth = (baseValueWidth * (5 - widthMul)).round().clamp(2, 8);
 
     rowColumns([
       col(left, leftWidth, size: size, bold: bold),
@@ -319,7 +321,7 @@ class ThermalReceipt {
     required int qty,
     required String name,
     required num price,
-    ThermalFontSize size = ThermalFontSize.normal,
+    FontSize size = FontSize.normal,
   }) {
     // format "qty x price"
     final priceText = '$qty x ${formatMoney(price)}';
@@ -333,6 +335,68 @@ class ThermalReceipt {
         size: size,
       ),
     ]);
+  }
+
+  /// Smart row dengan alignment otomatis untuk tanda ":"
+  /// 
+  /// Format: Label : Value dengan tanda : selaras vertikal
+  /// Contoh:
+  /// ```dart
+  /// receipt.rowLabel('Nama Penerima', 'John Doe');
+  /// receipt.rowLabel('No. Referensi', '123456789');
+  /// receipt.rowLabel('Tanggal', '2026-02-03');
+  /// ```
+  /// 
+  /// Akan menghasilkan:
+  /// ```
+  /// Nama Penerima : John Doe
+  /// No. Referensi : 123456789
+  /// Tanggal       : 2026-02-03
+  /// ```
+  /// 
+  /// Tanda ":" akan selaras berdasarkan label terpanjang
+  void rowLabel(
+    String label,
+    String value, {
+    FontSize size = FontSize.normal,
+    bool bold = false,
+  }) {
+    // Hitung jumlah karakter yang tersedia
+    final charsPerLine = size.getCharsPerLine58mm(); // Default 58mm, bisa disesuaikan
+    
+    // Format: label (dengan padding) + " : " + value
+    // Minimum padding adalah 1 karakter
+    final colonText = ' : ';
+    final maxLabelWidth = (charsPerLine * 0.4).floor(); // 40% untuk label
+    
+    // Jika label lebih panjang dari maksimal, gunakan apa adanya
+    final paddedLabel = label.length <= maxLabelWidth
+        ? label.padRight(maxLabelWidth)
+        : label;
+    
+    final fullText = '$paddedLabel$colonText$value';
+    
+    // Cetak sebagai text biasa dengan alignment left
+    text(fullText, size: size, bold: bold, center: false);
+  }
+
+  /// Smart row dengan alignment untuk tanda ":" dengan custom width
+  /// 
+  /// Sama seperti rowLabel() tapi dengan kontrol width untuk label
+  void rowLabelCustom(
+    String label,
+    String value, {
+    int labelWidth = 20,
+    FontSize size = FontSize.normal,
+    bool bold = false,
+  }) {
+    final paddedLabel = label.length <= labelWidth
+        ? label.padRight(labelWidth)
+        : label;
+    
+    final fullText = '$paddedLabel : $value';
+    
+    text(fullText, size: size, bold: bold, center: false);
   }
 
   // -----------------------
