@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 export 'src/models/bluetooth_printer.dart';
 export 'src/models/thermal_paper.dart';
 export 'src/models/font_size.dart';
+export 'src/models/barcode_data.dart';
 export 'thermal_receipt.dart';
 
 // Internal imports (not exported)

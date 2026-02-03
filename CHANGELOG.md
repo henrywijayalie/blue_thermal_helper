@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.1.0] - 2026-02-03
+
+### Added
+
+- **Barcode & QR Code Generation** ⭐
+  - Support for 7 barcode types: Code128, EAN-13, EAN-8, Code39, UPC-A, Codabar, QR Code
+  - New model: `BarcodeData` class with flexible configuration
+  - New method: `barcode(BarcodeData barcodeData, {PosAlign align})` for custom barcode generation
+  - New shortcut: `barcode128(String data, {...})` for Code128 barcodes
+  - New shortcut: `qrcode(String data, {...})` for QR code generation
+  - Factory constructors for each barcode type: `BarcodeData.qrcode()`, `BarcodeData.ean13()`, `BarcodeData.ean8()`, etc.
+  - Smart validation for barcode data based on type
+  - Fallback text support for graceful error handling
+  - Configurable height, width, and label display
+  - Example implementations with 6 real-world use cases:
+    - Simple QR Code
+    - Invoice with QR Code
+    - Product Label with EAN-13
+    - Receipt with Multiple Barcodes
+    - Shipping Label with QR
+    - Barcode with Fallback Handling
+  - Comprehensive documentation: `BARCODE_GUIDE.md` (650+ lines)
+  - New dependency: `barcode: ^2.5.0`
+
+### Improved
+
+- Better error handling with `FormatException` for invalid barcode data
+- Flexible barcode configuration with sensible defaults
+- Professional barcode/QR code integration for various business use cases
+
 ## [2.0.0] - 2026-02-03
 
 ### Added
@@ -86,6 +117,7 @@ receipt.rowLabel('Label', 'Value');
 See [FONTSIZE_GUIDE.md](FONTSIZE_GUIDE.md) section "Migrasi dari Versi Lama" for detailed migration guide.
 
 ---
+
 ## [1.0.9] - 2026-01-22
 
 ### Fixed

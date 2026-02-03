@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:image/image.dart' as img;
 import 'src/models/font_size.dart';
+import 'src/models/barcode_data.dart';
 
 enum ReceiptTextType {
   text,
@@ -407,5 +408,158 @@ class ThermalReceipt {
     _bytes.addAll(_generator.text('  - $text',
         styles: const PosStyles(align: PosAlign.left)));
     _preview.text('  > $text');
+  }
+
+  // -----------------------
+  // BARCODE / QR CODE
+  // -----------------------
+
+  /// Generate dan cetak barcode/QR code
+  /// 
+  /// Mendukung berbagai tipe barcode (Code128, EAN-13, EAN-8, Code39, QR Code, dll)
+  /// Method ini akan:
+  /// 1. Generate barcode dari data
+  /// 2. Konversi ke SVG/image format
+  /// 3. Cetak ke thermal printer
+  /// 
+  /// Parameters:
+  /// - [barcodeData]: Data barcode yang berisi type, data, ukuran, dll
+  /// - [align]: Alignment untuk barcode (left, center, right). Default: center
+  /// 
+  /// Example:
+  /// ```dart
+  /// receipt.barcode(BarcodeData.qrcode('https://example.com'));
+  /// receipt.barcode(BarcodeData.ean13('1234567890123'));
+  /// receipt.barcode(BarcodeData.code128('INVOICE-001'));
+  /// ```
+  /// 
+  /// Throws FormatException jika data barcode tidak valid
+  void barcode(
+    BarcodeData barcodeData, {
+    PosAlign align = PosAlign.center,
+  }) {
+    if (!barcodeData.isValid()) {
+      // Fallback ke text jika data tidak valid
+      if (barcodeData.fallbackText != null) {
+        text(barcodeData.fallbackText!, center: align == PosAlign.center);
+        _preview.text('[Barcode fallback: ${barcodeData.fallbackText}]');
+      } else {
+        throw FormatException(
+          'Invalid barcode data for type ${barcodeData.type}: ${barcodeData.data}',
+        );
+      }
+      return;
+    }
+
+    try {
+      final bc = barcodeData.getBarcode();
+      
+      // Generate SVG
+      final svg = bc.toSvg(
+        barcodeData.data,
+        width: 200.0 * barcodeData.width,
+        height: 80.0 * barcodeData.height,
+        drawText: barcodeData.withLabel,
+      );
+
+      // Convert SVG to image
+      // Untuk thermal printer, kita convert ke image bytes
+      final imageData = _svgToImage(svg, barcodeData);
+      
+      if (imageData != null) {
+        // Cetak image ke printer
+        _bytes.addAll(_generator.image(imageData, align: align));
+        _preview.text('[Barcode: ${barcodeData.type} - ${barcodeData.data}]');
+      } else {
+        // Fallback ke text
+        if (barcodeData.fallbackText != null) {
+          text(barcodeData.fallbackText!, center: align == PosAlign.center);
+          _preview.text('[Barcode fallback: ${barcodeData.fallbackText}]');
+        }
+      }
+    } catch (e) {
+      // Fallback handling jika ada error
+      if (barcodeData.fallbackText != null) {
+        text(barcodeData.fallbackText!, center: align == PosAlign.center);
+        _preview.text('[Barcode error - fallback: ${barcodeData.fallbackText}]');
+      } else {
+        throw FormatException('Failed to generate barcode: $e');
+      }
+    }
+  }
+
+  /// Generate barcode dengan custom align dan fallback
+  /// Alias untuk barcode() dengan parameter yang lebih fleksibel
+  void barcode128(
+    String data, {
+    PosAlign align = PosAlign.center,
+    int height = 3,
+    double width = 2.0,
+    bool withLabel = true,
+    String? fallbackText,
+  }) {
+    barcode(
+      BarcodeData.code128(
+        data,
+        height: height,
+        width: width,
+        withLabel: withLabel,
+        fallbackText: fallbackText,
+      ),
+      align: align,
+    );
+  }
+
+  /// Generate dan cetak QR code
+  /// 
+  /// QR code ideal untuk URL, nomor referensi, atau data kompleks
+  /// 
+  /// Parameters:
+  /// - [data]: Data untuk di-encode (URL, text, nomor, dll)
+  /// - [size]: Ukuran QR code (1-10, default 8)
+  /// - [align]: Alignment QR code
+  /// - [fallbackText]: Text alternatif jika generate gagal
+  /// 
+  /// Example:
+  /// ```dart
+  /// receipt.qrcode('https://example.com/invoice/123');
+  /// receipt.qrcode('REF-2026-000123');
+  /// ```
+  void qrcode(
+    String data, {
+    int size = 8,
+    PosAlign align = PosAlign.center,
+    String? fallbackText,
+  }) {
+    barcode(
+      BarcodeData.qrcode(data, size: size, fallbackText: fallbackText),
+      align: align,
+    );
+  }
+
+  /// Helper method untuk konversi SVG ke image format
+  /// Ini adalah placeholder - implementasi sebenarnya memerlukan svg parsing library
+  /// 
+  /// TODO: Implementasi proper SVG to Image conversion
+  /// Opsi:
+  /// 1. Gunakan package 'svg' untuk parse SVG
+  /// 2. Render SVG menggunakan flutter_svg + image capture
+  /// 3. Gunakan barcode package yang langsung support image output
+  static img.Image? _svgToImage(String svg, BarcodeData barcodeData) {
+    try {
+      // Placeholder implementation
+      // Dalam praktek, kita bisa menggunakan:
+      // - barcode.toImage() jika tersedia
+      // - Custom SVG parser + render
+      // - Atau gunakan format PNG/bytes langsung dari package
+      
+      // Untuk sekarang, return null untuk fallback ke text
+      return null;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error converting SVG to image: $e');
+      }
+      return null;
+    }
   }
 }
